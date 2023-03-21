@@ -1,0 +1,105 @@
+package Network;
+
+import Model.ResponseModel;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
+
+public class FirstConnection extends JFrame implements ActionListener {
+    private JPanel TM01;
+    private JButton submitButton;
+    private JTextField tfmessage;
+    private JTextField tfstatus;
+    private JTextField tfcomment;
+    private JButton closebutton;
+    private JLabel messagetext;
+    private JLabel statustext;
+    private JTextField tfJumlahkata;
+    private JLabel commenttext;
+    private JLabel lbconect;
+    private JButton minimizebutton;
+
+
+    public FirstConnection() {
+        setContentPane(TM01);
+        setTitle("TM1-220900109-Zidanreksapratama");
+        setSize(450, 300);
+        setUndecorated(true);
+        setVisible(true);
+
+
+
+
+
+
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ConnectURI koneksiku = new ConnectURI();
+                URL myAddres = koneksiku.buildURL
+                        ("https://harber.mimoapps.xyz/api/getaccess.php");
+                String response = null;
+                try {
+                    response = koneksiku.getResponseFromHttpUrl(myAddres);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                System.out.println(response);
+
+                assert response != null;
+                JSONArray responseJSON = new JSONArray(response.toString());
+                ArrayList<ResponseModel> responseModel = new ArrayList<>();
+                for (int i = 0; i < responseJSON.length(); i++) {
+                    ResponseModel resModel = new ResponseModel();
+                    JSONObject myJSONObject = responseJSON.getJSONObject(i);
+                    resModel.setMessage(myJSONObject.getString("message"));
+                    resModel.setStatus(myJSONObject.getString("status"));
+                    resModel.setComments(myJSONObject.getString("comment"));
+                    responseModel.add(resModel);
+                }
+                System.out.println("Response are : ");
+                for (int index = 0; index < responseModel.size(); index++) {
+                    tfmessage.setText(responseModel.get(index).getMessage());
+                    tfstatus.setText(responseModel.get(index).getStatus());
+                    tfcomment.setText(responseModel.get(index).getComments());
+
+                    tfJumlahkata.setText(String.valueOf(responseModel.get(index).getMessage().length()));
+                }
+            }
+        })
+        ;
+        closebutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        minimizebutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setState(ICONIFIED);
+            }
+        });
+    }
+
+
+    public static void main(String[] args) {
+
+        FirstConnection MyFrame = new FirstConnection();
+
+
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+    }
+}
